@@ -30,7 +30,7 @@
       />
 
       <!-- Remember Me -->
-      <div class="relative flex items-center my-5">
+      <div class="relative flex items-start mt-5">
         <CheckboxInput
           v-model="remember"
           class="w-full md:w-1/2"
@@ -52,15 +52,29 @@
 
       <!-- Submit Button -->
       <v-button
-        dusk="btn_login"
+        class="w-full flex"
         :loading="form.busy || loading"
       >
         Log in to continue
       </v-button>
 
+      <v-button
+        v-if="useFeatureFlag('services.google.auth')"
+        native-type="button"
+        color="white"
+        class="space-x-4 mt-4 flex items-center w-full"
+        :loading="false"
+        @click.prevent="signInwithGoogle"
+      >
+        <Icon
+          name="devicon:google"
+          class="w-4 h-4"
+        />
+        <span class="mx-2">Sign in with Google</span>
+      </v-button>
       <p
-        v-if="!appStore.selfHosted"
-        class="text-gray-500 mt-4"
+        v-if="!useFeatureFlag('self_hosted')"
+        class="text-gray-500 text-sm text-center mt-4"
       >
         Don't have an account?
         <a
@@ -106,6 +120,7 @@ export default {
       authStore: useAuthStore(),
       formsStore: useFormsStore(),
       workspaceStore: useWorkspacesStore(),
+      providersStore: useOAuthProvidersStore()
     }
   },
 
@@ -118,6 +133,8 @@ export default {
     remember: false,
     showForgotModal: false,
   }),
+
+  computed: {},
 
   methods: {
     login() {
@@ -170,6 +187,9 @@ export default {
         router.push({ name: "home" })
       }
     },
+    signInwithGoogle() {
+      this.providersStore.guestConnect('google', true)
+    }
   },
 }
 </script>

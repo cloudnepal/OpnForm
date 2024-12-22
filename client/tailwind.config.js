@@ -11,6 +11,7 @@ module.exports = {
     "./error.vue",
     "./lib/forms/themes/form-themes.js",
     "./lib/forms/themes/ThemeBuilder.js",
+    './data/**/*.json'
   ],
   safelist: [
     {
@@ -93,6 +94,8 @@ module.exports = {
     plugin(function ({ addVariant }) {
       addVariant("between", "&:not(:first-child):not(:last-child)")
       addVariant("hocus", ["&:hover", "&:focus"])
+      // Add a new variant that only applies when there's no RTL parent
+      addVariant('ltr-only', '&:where(:not([dir="rtl"] *))')
     }),
   ],
 }

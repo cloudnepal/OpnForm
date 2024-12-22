@@ -2,46 +2,35 @@
 services:
   api: &api
     image: jhumanj/opnform-api:latest
-    environment:
+    environment: &api-environment  # Add this anchor
       DB_HOST: db
       REDIS_HOST: redis
-
       DB_DATABASE: ${DB_DATABASE:-forge}
       DB_USERNAME: ${DB_USERNAME:-forge}
       DB_PASSWORD: ${DB_PASSWORD:-forge}
       DB_CONNECTION: ${DB_CONNECTION:-pgsql}
-      LOG_LEVEL: ${LOG_LEVEL:-debug}
-      LOG_CHANNEL: ${LOG_CHANNEL:-errorlog}
-      AWS_ENDPOINT: http://minio:9000
-      AWS_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY:-minio}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY:-minio123}
       FILESYSTEM_DISK: local
-      AWS_REGION: eu-west-1
-      AWS_BUCKET: laravel-bucket
       LOCAL_FILESYSTEM_VISIBILITY: public
-      FRONT_URL: ${FRONT_URL:-http://localhost}
-    env_file: ./.env
+    env_file: 
+    - ./api/.env
     volumes:
-      - laravel-persist:/persist
-      - secrets-config:/secrets
+    - opnform_storage:/usr/share/nginx/html/storage:rw
 
   api-worker:
-    <<: *api
-    command: ./artisan queue:work
+    image: jhumanj/opnform-api:latest
+    command: php artisan queue:work
+    environment:
+      <<: *api-environment
+      IS_API_WORKER: "true"
+    env_file: 
+    - ./api/.env
+    volumes:
+    - opnform_storage:/usr/share/nginx/html/storage:rw
 
   ui:
     image: jhumanj/opnform-client:latest
-    environment:
-      NUXT_PUBLIC_APP_URL: ${NUXT_PUBLIC_APP_URL:-/}
-      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-/api}
-      NUXT_PRIVATE_API_BASE: http://ingress/api
     env_file: 
-      - ./client/.env
-    volumes:
-      - secrets-config:/secrets
-      - ./client/.env:/app/.env
-
-
+    - ./client/.env
 
   redis:
     image: redis:7
@@ -63,6 +52,5 @@ services:
       - 80:80
 
 volumes:
-  laravel-persist:
   postgres-data:
-  secrets-config:
+  opnform_storage:

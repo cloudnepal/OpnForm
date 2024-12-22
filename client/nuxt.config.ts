@@ -9,15 +9,46 @@ export default defineNuxtConfig({
     devtools: {enabled: true},
     css: ['~/scss/app.scss'],
     modules: [
-        '@pinia/nuxt',
-        '@vueuse/nuxt',
-        '@vueuse/motion/nuxt',
-        'nuxt-simple-sitemap',
-        '@nuxt/ui',
+        '@pinia/nuxt', 
+        '@vueuse/nuxt', 
+        '@vueuse/motion/nuxt', 
+        '@nuxtjs/sitemap',
+        '@nuxt/ui', 
+        'nuxt-utm', 
+        '@nuxtjs/i18n',
+        '@nuxt/icon', 
         ...process.env.NUXT_PUBLIC_GTM_CODE ? ['@zadigetvoltaire/nuxt-gtm'] : [],
     ],
     build: {
-        transpile: process.env.NODE_ENV === "development" ? [] : ["vue-notion", "query-builder-vue-3", "vue-signature-pad"],
+        transpile: ["vue-notion", "query-builder-vue-3", "vue-signature-pad"],
+    },
+    i18n: {
+        locales: [
+          { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' },
+          { code: 'fr', name: 'French', iso: 'fr-FR', file: 'fr.json' },
+          { code: 'hi', name: 'Hindi', iso: 'hi-IN', file: 'hi.json' },
+          { code: 'es', name: 'Spanish', iso: 'es-ES', file: 'es.json' },
+          { code: 'ar', name: 'Arabic', iso: 'ar-EG', file: 'ar.json' },
+          { code: 'zh', name: 'Chinese', iso: 'zh-CN', file: 'zh.json' },
+          { code: 'ja', name: 'Japanese', iso: 'ja-JP', file: 'ja.json' },
+          { code: 'bn', name: 'Bengali', iso: 'bn-BD', file: 'bn.json' },
+          { code: 'pt', name: 'Portuguese', iso: 'pt-BR', file: 'pt.json' },
+          { code: 'ru', name: 'Russian', iso: 'ru-RU', file: 'ru.json' },
+          { code: 'ur', name: 'Urdu', iso: 'ur-PK', file: 'ur.json' },
+          { code: 'pa', name: 'Punjabi', iso: 'pa-IN', file: 'pa.json' },
+          { code: 'de', name: 'German', iso: 'de-DE', file: 'de.json' },
+          { code: 'jv', name: 'Javanese', iso: 'jv-ID', file: 'jv.json' },
+          { code: 'ko', name: 'Korean', iso: 'ko-KR', file: 'ko.json' },
+          { code: 'vi', name: 'Vietnamese', iso: 'vi-VN', file: 'vi.json' },
+          { code: 'te', name: 'Telugu', iso: 'te-IN', file: 'te.json' },
+          { code: 'mr', name: 'Marathi', iso: 'mr-IN', file: 'mr.json' },
+          { code: 'ta', name: 'Tamil', iso: 'ta-IN', file: 'ta.json' },
+          { code: 'tr', name: 'Turkish', iso: 'tr-TR', file: 'tr.json' },
+        ],
+        defaultLocale: 'en',
+        lazy: true,
+        langDir: 'lang/',
+        strategy: 'no_prefix'
     },
     experimental: {
         inlineRouteRules: true
@@ -40,6 +71,11 @@ export default defineNuxtConfig({
             pathPrefix: false,
         },
         {
+            path: '~/components/forms',
+            pathPrefix: false,
+            global: true
+        },
+        {
             path: '~/components/pages',
             pathPrefix: false,
         },
@@ -60,6 +96,11 @@ export default defineNuxtConfig({
                 project: "opnform-vue",
             }),
         ],
+        server: {
+            hmr: {
+                clientPort: 3000
+            }
+        }
     },
     tailwindcss: {
         cssPath: ['~/scss/app.scss']
@@ -69,9 +110,13 @@ export default defineNuxtConfig({
         fallback: 'light',
         classPrefix: '',
     },
-    ui: {
-        icons: ['heroicons', 'material-symbols'],
-    },
+    icon: {
+        clientBundle: {
+            scan: {
+                globInclude: ['**/*.vue', '**/*.json'],
+            },
+        },
+      },
     sitemap,
     runtimeConfig,
     gtm

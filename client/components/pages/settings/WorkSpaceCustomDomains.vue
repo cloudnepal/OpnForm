@@ -1,11 +1,11 @@
 <template>
   <div
-    v-if="customDomainsEnabled"
+    v-if="useFeatureFlag('custom_domains')"
     id="custom-domains"
   >
     <UButton
       color="gray"
-      label="Manage Custom Domains"
+      label="Custom Domains Settings"
       icon="i-heroicons-globe-alt"
       @click="showCustomDomainModal = !showCustomDomainModal"
     />
@@ -16,7 +16,7 @@
       @close="showCustomDomainModal = false"
     >
       <h4 class="mb-4 font-medium">
-        Manage your custom domains
+        Custom Domains Settings
       </h4>
       <UAlert
         v-if="!workspace.is_pro"
@@ -81,10 +81,6 @@ const customDomainsForm = useForm({
 })
 const customDomainsLoading = ref(false)
 const showCustomDomainModal = ref(false)
-
-const customDomainsEnabled = computed(
-  () => useRuntimeConfig().public.customDomainsEnabled,
-)
 
 onMounted(() => {
   initCustomDomains()

@@ -140,6 +140,7 @@
 import OpenText from "./components/OpenText.vue"
 import OpenUrl from "./components/OpenUrl.vue"
 import OpenSelect from "./components/OpenSelect.vue"
+import OpenMatrix from "./components/OpenMatrix.vue"
 import OpenDate from "./components/OpenDate.vue"
 import OpenFile from "./components/OpenFile.vue"
 import OpenCheckbox from "./components/OpenCheckbox.vue"
@@ -192,11 +193,13 @@ export default {
       rafId: null,
       fieldComponents: {
         text: shallowRef(OpenText),
+        rich_text: shallowRef(OpenText),
         number: shallowRef(OpenText),
         rating: shallowRef(OpenText),
         scale: shallowRef(OpenText),
         slider: shallowRef(OpenText),
         select: shallowRef(OpenSelect),
+        matrix: shallowRef(OpenMatrix),
         multi_select: shallowRef(OpenSelect),
         date: shallowRef(OpenDate),
         files: shallowRef(OpenFile),

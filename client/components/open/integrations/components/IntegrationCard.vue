@@ -3,7 +3,7 @@
     class="text-gray-500 border shadow rounded-md p-5 mt-4 relative flex items-center"
   >
     <div
-      class="flex items-center"
+      class="flex items-center w-full md:max-w-[240px]"
       :class="{'flex-grow': !actionsComponent}"
     >
       <div
@@ -92,6 +92,7 @@
           </v-button>
         </template>
         <a
+          v-if="integrationTypeInfo.is_editable !== false"
           v-track.edit_form_integration_click="{
             form_slug: form.slug,
             form_integration_id: integration.id,
@@ -105,6 +106,21 @@
             class="w-5 h-5 mr-2"
           />
           Edit
+        </a>
+        <a
+          v-else-if="integrationTypeInfo.url"
+          v-track.edit_form_integration_click="{
+            form_slug: form.slug,
+            form_integration_id: integration.id,
+          }"
+          :href="integrationTypeInfo.url"
+          class="flex px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:no-underline hover:text-gray-900 items-center"
+        >
+          <Icon
+            name="heroicons:pencil"
+            class="w-5 h-5 mr-2"
+          />
+          Edit on {{ integrationTypeInfo.name }}
         </a>
         <a
           v-track.past_events_form_integration_click="{
@@ -187,7 +203,7 @@ const showIntegrationEventsModal = ref(false)
 const loadingDelete = ref(false)
 
 const actionsComponent = computed(() => {
-  if(integrationTypeInfo.value.actions_file_name) {
+  if(integrationTypeInfo.value?.actions_file_name || false) {
     return resolveComponent(integrationTypeInfo.value.actions_file_name)
   }
 

@@ -47,7 +47,7 @@ import { computed } from "vue"
 import { useAuthStore } from "../stores/auth"
 
 definePageMeta({
-  middleware: "auth",
+  middleware: ["auth", "self-hosted-credentials"],
 })
 
 useOpnSeoMeta({
@@ -65,6 +65,10 @@ const tabsList = computed(() => {
     {
       name: "Workspace Settings",
       route: "settings-workspace",
+    },
+    {
+      name: "Access Tokens",
+      route: "settings-access-tokens",
     },
     {
       name: "Connections",

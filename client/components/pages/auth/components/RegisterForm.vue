@@ -1,7 +1,6 @@
 <template>
   <div>
     <form
-      class="mt-4"
       @submit.prevent="register"
       @keydown="form.onKeydown($event)"
     >
@@ -53,9 +52,23 @@
         label="Confirm Password"
       />
 
+      <!-- Captcha -->
+      <div
+        v-if="recaptchaSiteKey"
+        class="my-4 px-2 mx-auto w-max"
+      >
+        <CaptchaInput
+          ref="captcha"
+          provider="recaptcha"
+          :form="form"
+          language="en"
+        />
+      </div>
+
       <checkbox-input
         :form="form"
         name="agree_terms"
+        class="mb-3"
         :required="true"
       >
         <template #label>
@@ -63,6 +76,7 @@
           <NuxtLink
             :to="{ name: 'terms-conditions' }"
             target="_blank"
+            class="underline"
           >
             Terms and conditions
           </NuxtLink>
@@ -70,6 +84,7 @@
           <NuxtLink
             :to="{ name: 'privacy-policy' }"
             target="_blank"
+            class="underline"
           >
             Privacy policy
           </NuxtLink>
@@ -78,16 +93,35 @@
       </checkbox-input>
 
       <!-- Submit Button -->
-      <v-button :loading="form.busy">
-        Create an account
+      <v-button
+        class="w-full mt-4"
+        :loading="form.busy"
+      >
+        Create account
       </v-button>
 
-      <p class="text-gray-500 mt-4">
+      <template v-if="useFeatureFlag('services.google.auth')">
+        <p class="text-gray-600/50 text-sm text-center my-4">
+          Or
+        </p>
+        <v-button
+          native-type="buttom"
+          color="white"
+          class="space-x-4 flex items-center w-full"
+          :loading="false"
+          @click.prevent="signInwithGoogle"
+        >
+          <Icon name="devicon:google" />
+          <span class="mx-2">Sign in with Google</span>
+        </v-button>
+      </template>
+
+      <p class="text-gray-500 mt-4 text-sm text-center">
         Already have an account?
         <a
           v-if="isQuick"
           href="#"
-          class="font-semibold ml-1"
+          class="font-medium ml-1"
           @click.prevent="$emit('openLogin')"
         >Log In</a>
         <NuxtLink
@@ -104,7 +138,7 @@
 
 <script>
 import {opnFetch} from "~/composables/useOpnApi.js"
-import {fetchAllWorkspaces} from "~/stores/workspaces.js"
+import { fetchAllWorkspaces } from "~/stores/workspaces.js"
 
 export default {
   name: "RegisterForm",
@@ -119,11 +153,15 @@ export default {
   emits: ['afterQuickLogin', 'openLogin'],
 
   setup() {
+    const { $utm } = useNuxtApp()
     return {
       authStore: useAuthStore(),
       formsStore: useFormsStore(),
       workspaceStore: useWorkspacesStore(),
+      providersStore: useOAuthProvidersStore(),
+      runtimeConfig: useRuntimeConfig(),
       logEvent: useAmplitude().logEvent,
+      $utm
     }
   },
 
@@ -135,11 +173,16 @@ export default {
       password_confirmation: "",
       agree_terms: false,
       appsumo_license: null,
+      utm_data: null,
+      'g-recaptcha-response': null
     }),
-    disableEmail:false
+    disableEmail: false,
   }),
 
   computed: {
+    recaptchaSiteKey() {
+      return this.runtimeConfig.public.recaptchaSiteKey
+    },
     hearAboutUsOptions() {
       const options = [
         {name: "Facebook", value: "facebook"},
@@ -182,6 +225,11 @@ export default {
   methods: {
     async register() {
       let data
+      this.form.utm_data = this.$utm.value
+      // Reset captcha after submission
+      if (import.meta.client && this.recaptchaSiteKey) {
+        this.$refs.captcha.reset()
+      }
       try {
         // Register the user.
         data = await this.form.post("/register")
@@ -241,6 +289,9 @@ export default {
         }
       }
     },
+    signInwithGoogle() {
+      this.providersStore.guestConnect('google', true)
+    }
   },
 }
 </script>
